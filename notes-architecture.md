@@ -45,3 +45,77 @@
 ### Autres :
 
 - Un composant header pourrait être créé pour éviter la redondance dans les 2 fichiers home.hmtl et country.html (titre + KPIs)
+
+## Architecture cible
+
+_réalisée via https://tree.nathanfriend.com_
+
+Légende :
+
+- ✨ : Nouveaux dossiers et fichiers à créer
+- ♻️ : Fichiers existants à nettoyer et refactoriser
+- 📦 : Fichiers existants à conserver tels quels
+
+```
+src/
+├── 📦 favicon.ico
+├── 📦 index.html
+├── 📦 main.ts
+├── 📦 polyfills.ts
+├── 📦 styles.scss
+├── 📦 test.ts
+│
+├── app/
+│   ├── ♻️ app-routing.module.ts        # routes (Va être modifié pour la route country/:id)
+│   ├── ♻️ app.component.html
+│   ├── 📦 app.component.scss
+│   ├── 📦 app.component.spec.ts
+│   ├── ♻️ app.component.ts             # squelette : <router-outlet> + chargement initial des données
+│   ├── ♻️ app.module.ts                # déclarations + httpClient (Va déclarer le HeaderComponent)
+│   │
+│   ├── ✨ core/                        # logique métier, sans UI
+│   │   ├── models/
+│   │   │   ├── olympic.ts              # interface Olympic
+│   │   │   ├── participation.ts        # interface Participation
+│   │   │   └── stat-item.ts            # interface StatItem (indicateur libellé/valeur)
+│   │   ├── services/
+│   │   │   └── olympic.service.ts      # le DataService : accès centralisé aux données
+│   │   └── constants/
+│   │       └── chart-colors.ts         # palette de couleur factorisée
+│   │
+│   ├── ✨ components/                  # composants réutilisables (UI pure)
+│   │   └── header/                     # titre + KPIs
+│   │       ├── header.component.html
+│   │       ├── header.component.scss
+│   │       └── header.component.ts
+│   │
+│   └── pages/                          # composants routés (un par écran)
+│       ├── ♻️ country/                 # détail pays (line chart, vidé de sa logique HTTP et CSS dupliqué)
+│       │   ├── country.component.html
+│       │   ├── country.component.scss
+│       │   ├── country.component.spec.ts
+│       │   └── country.component.ts
+│       │
+│       ├── ♻️ home/                    # dashboard d'accueil (pie chart, utilisera le Header et le Service)
+│       │   ├── home.component.html
+│       │   ├── home.component.scss
+│       │   ├── home.component.spec.ts
+│       │   └── home.component.ts
+│       │
+│       └── 📦 not-found/                  # page d'erreur
+│           ├── not-found.component.html
+│           ├── not-found.component.scss
+│           ├── not-found.component.spec.ts
+│           └── not-found.component.ts
+│
+├── 📦 assets/
+│   ├── .gitkeep
+│   ├── images/
+│   │   └── teleSport.png
+│   └── mock/
+│       └── olympic.json                # base de données
+│
+└── 📦 environments/
+    ├── environment.prod.ts
+    └── environment.ts
+```
