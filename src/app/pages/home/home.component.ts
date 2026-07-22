@@ -1,71 +1,90 @@
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {Component, OnInit} from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import Chart from 'chart.js/auto';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import Chart, { ChartEvent } from 'chart.js/auto';
 import { Olympic } from '../../core/models/olympic';
+import { OlympicService } from '../../core/services/olympic.service';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit {
-  private olympicUrl = './assets/mock/olympic.json';
-  public pieChart!: Chart<"pie", number[], string>;
-  public totalCountries: number = 0
-  public totalJOs: number = 0
-  public error!:string
-  titlePage: string = "Medals per Country";
+export class HomeComponent implements OnInit, AfterViewInit {
+  public titlePage = 'Medals per Country';
+  public totalCountries = 0;
+  public totalJOs = 0;
 
-  constructor(private router: Router, private http:HttpClient) { }
+  private readonly destroyRef = inject(DestroyRef);
+  private olympics: Olympic[] = [];
+  private viewReady = false;
+  private pieChart?: Chart<'pie', number[], string>;
 
-  ngOnInit() {
-    this.http.get<Olympic[]>(this.olympicUrl).pipe().subscribe(
-      (data) => {
-        console.log(`Liste des données : ${JSON.stringify(data)}`);
-        if (data && data.length > 0) {
-          this.totalJOs = Array.from(new Set(data.map((olympic) => olympic.participations.map((participation) => participation.year)).flat())).length;
-          const countries: string[] = data.map((olympic) => olympic.country);
-          this.totalCountries = countries.length;
-          const medals = data.map((olympic) => olympic.participations.map((participation) => participation.medalsCount));
-          const sumOfAllMedalsYears = medals.map((countryMedals) => countryMedals.reduce((acc, count) => acc + count, 0));
-          this.buildPieChart(countries, sumOfAllMedalsYears);
+  constructor(private router: Router, private olympicService: OlympicService) {}
+
+  ngOnInit(): void {
+    this.olympicService
+      .getOlympics()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((olympics) => {
+        if (!olympics || olympics.length === 0) {
+          return;
         }
-      },
-      (error:HttpErrorResponse) => {
-        console.log(`erreur : ${error}`);
-        this.error = error.message
-      }
-    )
+        this.olympics = olympics;
+        this.totalCountries = olympics.length;
+        this.totalJOs = new Set(
+          olympics.flatMap((olympic) => olympic.participations.map((participation) => participation.year))
+        ).size;
+        if (this.viewReady) {
+          this.renderPieChart();
+        }
+      });
   }
 
-  buildPieChart(countries: string[], sumOfAllMedalsYears: number[]) {
-    const pieChart = new Chart("DashboardPieChart", {
+  ngAfterViewInit(): void {
+    this.viewReady = true;
+    if (this.olympics.length > 0) {
+      this.renderPieChart();
+    }
+  }
+
+  private renderPieChart(): void {
+    const countries = this.olympics.map((olympic) => olympic.country);
+    const medalsPerCountry = this.olympics.map((olympic) =>
+      olympic.participations.reduce((total, participation) => total + participation.medalsCount, 0)
+    );
+    this.pieChart?.destroy();
+    this.pieChart = new Chart('DashboardPieChart', {
       type: 'pie',
       data: {
         labels: countries,
-        datasets: [{
-          label: 'Medals',
-          data: sumOfAllMedalsYears,
-          backgroundColor: ['#0b868f', '#adc3de', '#7a3c53', '#8f6263', 'orange', '#94819d'],
-          hoverOffset: 4
-        }],
+        datasets: [
+          {
+            label: 'Medals',
+            data: medalsPerCountry,
+            backgroundColor: ['#0b868f', '#adc3de', '#7a3c53', '#8f6263', 'orange', '#94819d'],
+            hoverOffset: 4,
+          },
+        ],
       },
       options: {
         aspectRatio: 2.5,
-        onClick: (e) => {
-          if (e.native) {
-            const points = pieChart.getElementsAtEventForMode(e.native, 'point', { intersect: true }, true)
-            if (points.length) {
-              const firstPoint = points[0];
-              const countryName = pieChart.data.labels ? pieChart.data.labels[firstPoint.index] : '';
-              this.router.navigate(['country', countryName]);
-            }
-          }
-        }
-      }
+        onClick: (event) => this.onChartClick(event),
+      },
     });
-    this.pieChart = pieChart;
+  }
+
+  private onChartClick(event: ChartEvent): void {
+    if (!event.native || !this.pieChart) {
+      return;
+    }
+    const points = this.pieChart.getElementsAtEventForMode(event.native, 'point', { intersect: true }, true);
+    if (points.length === 0) {
+      return;
+    }
+    const country = this.pieChart.data.labels?.[points[0].index];
+    if (country) {
+      this.router.navigate(['country', country]);
+    }
   }
 }
-

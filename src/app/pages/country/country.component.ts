@@ -1,68 +1,82 @@
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
-import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, ParamMap, Router} from '@angular/router';
+import { AfterViewInit, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Chart from 'chart.js/auto';
 import { Olympic } from '../../core/models/olympic';
-import { Participation } from '../../core/models/participation';
-
+import { OlympicService } from '../../core/services/olympic.service';
 
 @Component({
   selector: 'app-country',
   templateUrl: './country.component.html',
-  styleUrls: ['./country.component.scss']
+  styleUrls: ['./country.component.scss'],
 })
-export class CountryComponent implements OnInit {
-  private olympicUrl = './assets/mock/olympic.json';
-  public lineChart!: Chart<"line", string[], number>;
-  public titlePage: string = '';
-  public totalEntries: number = 0;
-  public totalMedals: number = 0;
-  public totalAthletes: number = 0;
-  public error!: string;
+export class CountryComponent implements OnInit, AfterViewInit {
+  public titlePage = '';
+  public totalEntries = 0;
+  public totalMedals = 0;
+  public totalAthletes = 0;
 
-  constructor(private route: ActivatedRoute, private router: Router, private http: HttpClient) {
-  }
+  private readonly destroyRef = inject(DestroyRef);
+  private countryName: string | null = null;
+  private selectedCountry?: Olympic;
+  private viewReady = false;
+  private lineChart?: Chart<'line', number[], number>;
 
-  ngOnInit() {
-    let countryName: string | null = null
-    this.route.paramMap.subscribe((param: ParamMap) => countryName = param.get('countryName'));
-    this.http.get<Olympic[]>(this.olympicUrl).pipe().subscribe(
-      (data) => {
-        if (data && data.length > 0) {
-          const selectedCountry: Olympic | undefined = data.find((olympic) => olympic.country === countryName);
-          this.titlePage = selectedCountry?.country ?? '';
-          const participations: Participation[] = selectedCountry?.participations ?? [];
-          this.totalEntries = participations.length;
-          const years: number[] = participations.map((participation) => participation.year);
-          const medals: string[] = participations.map((participation) => participation.medalsCount.toString());
-          this.totalMedals = medals.reduce((accumulator, item) => accumulator + parseInt(item), 0);
-          this.totalAthletes = participations.reduce((accumulator, participation) => accumulator + participation.athleteCount, 0);
-          this.buildChart(years, medals);
+  constructor(private route: ActivatedRoute, private olympicService: OlympicService) {}
+
+  ngOnInit(): void {
+    this.countryName = this.route.snapshot.paramMap.get('countryName');
+    this.olympicService
+      .getOlympics()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((olympics) => {
+        if (!olympics) {
+          return;
         }
-      },
-      (error: HttpErrorResponse) => {
-        this.error = error.message
-      }
-    );
+        this.selectedCountry = olympics.find((olympic) => olympic.country === this.countryName);
+        if (!this.selectedCountry) {
+          return;
+        }
+        const participations = this.selectedCountry.participations;
+        this.titlePage = this.selectedCountry.country;
+        this.totalEntries = participations.length;
+        this.totalMedals = participations.reduce((total, participation) => total + participation.medalsCount, 0);
+        this.totalAthletes = participations.reduce((total, participation) => total + participation.athleteCount, 0);
+        if (this.viewReady) {
+          this.renderLineChart();
+        }
+      });
   }
 
-  buildChart(years: number[], medals: string[]) {
-    const lineChart = new Chart("countryChart", {
+  ngAfterViewInit(): void {
+    this.viewReady = true;
+    if (this.selectedCountry) {
+      this.renderLineChart();
+    }
+  }
+
+  private renderLineChart(): void {
+    if (!this.selectedCountry) {
+      return;
+    }
+    const years = this.selectedCountry.participations.map((participation) => participation.year);
+    const medals = this.selectedCountry.participations.map((participation) => participation.medalsCount);
+    this.lineChart?.destroy();
+    this.lineChart = new Chart('countryChart', {
       type: 'line',
       data: {
         labels: years,
         datasets: [
           {
-            label: "medals",
+            label: 'medals',
             data: medals,
-            backgroundColor: '#0b868f'
+            backgroundColor: '#0b868f',
           },
-        ]
+        ],
       },
       options: {
-        aspectRatio: 2.5
-      }
+        aspectRatio: 2.5,
+      },
     });
-    this.lineChart = lineChart;
   }
 }
