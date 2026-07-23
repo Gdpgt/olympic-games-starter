@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Chart from 'chart.js/auto';
 import { Olympic } from '../../core/models/olympic';
+import { StatItem } from '../../core/models/stat-item';
 import { OlympicService } from '../../core/services/olympic.service';
 
 @Component({
@@ -12,9 +13,7 @@ import { OlympicService } from '../../core/services/olympic.service';
 })
 export class CountryComponent implements OnInit, AfterViewInit {
   public titlePage = '';
-  public totalEntries = 0;
-  public totalMedals = 0;
-  public totalAthletes = 0;
+  public stats: StatItem[] = [];
 
   private readonly destroyRef = inject(DestroyRef);
   private countryId: number | null = null;
@@ -45,9 +44,17 @@ export class CountryComponent implements OnInit, AfterViewInit {
         }
         const participations = this.selectedCountry.participations;
         this.titlePage = this.selectedCountry.country;
-        this.totalEntries = participations.length;
-        this.totalMedals = participations.reduce((total, participation) => total + participation.medalsCount, 0);
-        this.totalAthletes = participations.reduce((total, participation) => total + participation.athleteCount, 0);
+        this.stats = [
+          { label: 'Number of entries', value: participations.length },
+          {
+            label: 'Total Number of medals',
+            value: participations.reduce((total, participation) => total + participation.medalsCount, 0),
+          },
+          {
+            label: 'Total Number of athletes',
+            value: participations.reduce((total, participation) => total + participation.athleteCount, 0),
+          },
+        ];
         if (this.viewReady) {
           this.renderLineChart();
         }

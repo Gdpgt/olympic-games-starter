@@ -1,0 +1,41 @@
+.page-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__title {
+    margin: 5px;
+    padding: 10px;
+    background: #0b868f;
+    border-radius: 10px;
+    color: white;
+    font-size: 1rem;
+    font-weight: normal;
+  }
+
+  &__stats {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin: 5px;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border: solid #0b868f 1px;
+    border-radius: 10px;
+    color: gray;
+    text-align: center;
+  }
+
+  &__stat-value {
+    font-weight: bold;
+    color: black;
+  }
+}

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Chart, { ChartEvent } from 'chart.js/auto';
 import { Olympic } from '../../core/models/olympic';
+import { StatItem } from '../../core/models/stat-item';
 import { OlympicService } from '../../core/services/olympic.service';
 
 @Component({
@@ -12,8 +13,7 @@ import { OlympicService } from '../../core/services/olympic.service';
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   public titlePage = 'Medals per Country';
-  public totalCountries = 0;
-  public totalJOs = 0;
+  public stats: StatItem[] = [];
 
   private readonly destroyRef = inject(DestroyRef);
   private olympics: Olympic[] = [];
@@ -31,10 +31,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
           return;
         }
         this.olympics = olympics;
-        this.totalCountries = olympics.length;
-        this.totalJOs = new Set(
+        const totalJOs = new Set(
           olympics.flatMap((olympic) => olympic.participations.map((participation) => participation.year))
         ).size;
+        this.stats = [
+          { label: 'Number of countries', value: olympics.length },
+          { label: 'Number of JOs', value: totalJOs },
+        ];
         if (this.viewReady) {
           this.renderPieChart();
         }

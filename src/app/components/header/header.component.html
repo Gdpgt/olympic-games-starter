@@ -1,0 +1,9 @@
+<header class="page-header">
+  <h2 class="page-header__title">{{ title }}</h2>
+  <ul class="page-header__stats">
+    <li class="page-header__stat" *ngFor="let stat of stats">
+      <span class="page-header__stat-label">{{ stat.label }}</span>
+      <span class="page-header__stat-value">{{ stat.value }}</span>
+    </li>
+  </ul>
+</header>
