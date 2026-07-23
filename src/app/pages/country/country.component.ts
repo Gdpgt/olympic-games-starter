@@ -89,6 +89,11 @@ export class CountryComponent implements OnInit, AfterViewInit {
       },
       options: {
         aspectRatio: 2.5,
+        scales: {
+          x: {
+            title: { display: true, text: 'Dates' },
+          },
+        },
       },
     });
   }
