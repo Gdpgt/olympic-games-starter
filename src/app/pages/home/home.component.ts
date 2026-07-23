@@ -82,9 +82,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
     if (points.length === 0) {
       return;
     }
-    const country = this.pieChart.data.labels?.[points[0].index];
-    if (country) {
-      this.router.navigate(['country', country]);
+    const olympic = this.olympics[points[0].index];
+    if (olympic) {
+      this.router.navigate(['country', olympic.id]);
     }
   }
 }
