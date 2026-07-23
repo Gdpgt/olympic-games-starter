@@ -1,29 +1,74 @@
-# OlympicGamesStarter
+# TéléSport — Jeux Olympiques
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.0.6.
+Application Angular affichant l'historique des médailles olympiques par pays :
+un dashboard avec un graphique en camembert et des indicateurs, et une page de
+détail par pays avec l'évolution des médailles édition par édition.
 
-Don't forget to install your node_modules before starting (`npm install`).
+## Sommaire
 
-## Development server
+- [Prérequis](#prérequis)
+- [Installation](#installation)
+- [Scripts](#scripts)
+- [Fonctionnalités](#fonctionnalités)
+- [Structure du projet](#structure-du-projet)
+- [Choix techniques](#choix-techniques)
+- [Captures d'écran](#captures-décran)
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## Prérequis
 
-## Build
+- [Node.js](https://nodejs.org/) 18 ou supérieur (npm inclus).
+- [Angular CLI](https://angular.dev/tools/cli) 18 : `npm install -g @angular/cli`.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Installation
 
-## Where to start
+```bash
+npm install
+```
 
-As you can see, an architecture has already been defined for the project. It is just a suggestion, you can choose to use your own. The predefined architecture includes (in addition to the default angular architecture) the following:
+## Scripts
 
-- `components` folder: contains every reusable components
-- `pages` folder: contains components used for routing
-- `core` folder: contains the business logic (`services` and `models` folders)
+| Commande        | Description                                             |
+| --------------- | ------------------------------------------------------ |
+| `npm start`     | Serveur de dev sur http://localhost:4200/ (`ng serve`) |
+| `npm run build` | Build de production dans `dist/` (`ng build`)          |
+| `npm run watch` | Build en continu (mode développement)                  |
+| `npm test`      | Tests unitaires (Karma + Jasmine)                      |
 
-I suggest you to start by understanding this starter code. Pay an extra attention to the `app-routing.module.ts` and the `olympic.service.ts`.
+## Fonctionnalités
 
-Once mastered, you should continue by creating the typescript interfaces inside the `models` folder. As you can see I already created two files corresponding to the data included inside the `olympic.json`. With your interfaces, improve the code by replacing every `any` by the corresponding interface.
+- **Dashboard** (`/`) : camembert du nombre total de médailles par pays, KPIs
+  (nombre de pays, nombre de JOs). Un clic sur un pays ouvre sa page de détail.
+- **Détail pays** (`/country/:id`) : KPIs (participations, total de médailles,
+  total d'athlètes), courbe d'évolution des médailles par édition, bouton retour.
+- **Gestion d'erreur** : URL inconnue ou identifiant de pays inexistant →
+  redirection vers une page d'erreur claire.
+- **Responsive** desktop / tablette / mobile et accessibilité de base (focus
+  clavier visible, descriptions textuelles des graphiques).
 
-You're now ready to implement the requested features.
+## Structure du projet
 
-Good luck!
+```
+src/app/
+├── core/          # logique métier : models, services, constants
+├── components/    # composants réutilisables (header)
+└── pages/         # écrans routés (home, country, not-found)
+```
+
+Les données proviennent de `src/assets/mock/olympic.json`, mais transitent
+uniquement par `OlympicService`, prêt à être branché sur une API REST.
+
+Le détail de l'architecture est documenté dans [ARCHITECTURE.md](./ARCHITECTURE.md).
+
+## Choix techniques
+
+- **Angular 18** (architecture par modules), **Chart.js** pour les graphiques.
+- **`OlympicService`** centralise les données via un `BehaviorSubject` chargé une
+  seule fois au démarrage et partagé entre les pages.
+- **Typage strict** : interfaces `Olympic` / `Participation` / `StatItem`, aucun
+  `any`.
+- **Observables** fermés automatiquement (`takeUntilDestroyed`).
+
+## Captures d'écran
+
+Les captures des deux pages (desktop et mobile) sont fournies dans un dossier
+`screenshots/` compressé, à joindre au rendu.
