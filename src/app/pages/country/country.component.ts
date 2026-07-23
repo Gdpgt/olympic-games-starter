@@ -2,6 +2,7 @@ import { AfterViewInit, Component, DestroyRef, OnInit, inject } from '@angular/c
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Chart from 'chart.js/auto';
+import { CHART_PRIMARY_COLOR } from '../../core/constants/chart-colors';
 import { Olympic } from '../../core/models/olympic';
 import { StatItem } from '../../core/models/stat-item';
 import { OlympicService } from '../../core/services/olympic.service';
@@ -83,7 +84,7 @@ export class CountryComponent implements OnInit, AfterViewInit {
           {
             label: 'medals',
             data: medals,
-            backgroundColor: '#0b868f',
+            backgroundColor: CHART_PRIMARY_COLOR,
           },
         ],
       },
