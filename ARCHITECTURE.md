@@ -1,4 +1,4 @@
-# Architecture — TéléSport (Jeux Olympiques)
+# Architecture - TéléSport (Jeux Olympiques)
 
 Ce document décrit l'organisation du front-end Angular après refactoring : la
 structure des dossiers, le rôle de chaque brique, et la façon dont les données
@@ -6,51 +6,50 @@ circulent. Il prépare aussi le terrain pour une future connexion à une API RES
 
 ## Vue d'ensemble
 
-Application Angular 18 (module `AppModule`, pas de standalone), routée en SPA. Les
-données sont pour l'instant mockées dans `src/assets/mock/olympic.json` mais
-transitent **exclusivement** par un service, exactement comme le ferait une API
-REST.
+Application Angular 18 (SPA).
+Les données sont pour l'instant mockées dans `src/assets/mock/olympic.json` mais
+transitent exclusivement par un service, comme le ferait une API REST.
 
 ## Arborescence
 
 ```
 src/app/
 ├── app-routing.module.ts        # routes de l'application
-├── app.component.*              # racine : <router-outlet> + chargement initial
-├── app.module.ts                # déclarations + provideHttpClient
+├── app.component.*              # racine <router-outlet> + chargement initial
+├── app.module.ts                # déclarations
 │
-├── core/                        # logique métier, sans UI
+├── core/                        # logique métier
 │   ├── models/
 │   │   ├── olympic.ts           # interface Olympic
 │   │   ├── participation.ts     # interface Participation
 │   │   └── stat-item.ts         # interface StatItem (indicateur libellé/valeur)
 │   ├── services/
-│   │   └── olympic.service.ts   # accès centralisé aux données
+│   │   └── olympic.service.ts   # le DataService : accès centralisé aux données
 │   └── constants/
-│       └── chart-colors.ts      # palette de couleurs des graphiques
+│       └── chart-colors.ts      # palette de couleurs des graphiques factorisées
 │
-├── components/                  # composants réutilisables (UI pure)
-│   └── header/                  # en-tête : titre + liste d'indicateurs
+├── components/                  # composants réutilisables (UI)
+│   └── header/                  # titre + stats
 │
 └── pages/                       # composants routés (un par écran)
-    ├── home/                    # dashboard : pie chart + KPIs
-    ├── country/                 # détail pays : line chart + KPIs
+    ├── home/                    # dashboard : pie chart + stats
+    ├── country/                 # détail pays : line chart + stats
     └── not-found/               # page d'erreur
 ```
 
 ## Rôle des dossiers
 
-- **`core/`** — tout ce qui ne dépend pas de l'affichage : interfaces de données
+- `core/` - tout ce qui ne dépend pas de l'affichage : interfaces de données
   (`models/`), accès aux données (`services/`), constantes partagées
   (`constants/`). C'est le point de contact avec le back-end à venir.
-- **`components/`** — composants d'UI réutilisables, sans logique métier, pilotés
-  par leurs `@Input()`. Le `HeaderComponent` affiche un titre et itère sur une
+- `components/` - composants d'UI réutilisables, sans logique métier.
+  Le `HeaderComponent` affiche un titre et itère sur une
   liste de `StatItem` (libellé/valeur) ; il est réutilisé par le dashboard et la
   page détail.
-- **`pages/`** — un composant par écran, câblé au routing. Chaque page récupère
+- `pages/` - un composant par écran, câblé au routing. Chaque page récupère
   ses données via le service et construit son graphique.
 
-## Le service : `OlympicService`
+## Le DataService : OlympicService
 
 `providedIn: 'root'` (singleton). Il centralise l'accès aux données selon le
 pattern **BehaviorSubject + chargement au démarrage** :
@@ -80,12 +79,12 @@ Aucun `any` : toutes les données sont typées par ces interfaces.
 
 ## Routing et gestion d'erreur
 
-| Route            | Composant           | Rôle                                   |
-| ---------------- | ------------------- | -------------------------------------- |
-| `''`             | `HomeComponent`     | dashboard (route par défaut)           |
-| `country/:id`    | `CountryComponent`  | détail d'un pays par identifiant       |
-| `not-found`      | `NotFoundComponent` | page d'erreur                          |
-| `**`             | `NotFoundComponent` | toute URL inconnue                     |
+| Route         | Composant           | Rôle                             |
+| ------------- | ------------------- | -------------------------------- |
+| `''`          | `HomeComponent`     | dashboard (route par défaut)     |
+| `country/:id` | `CountryComponent`  | détail d'un pays par identifiant |
+| `not-found`   | `NotFoundComponent` | page d'erreur                    |
+| `**`          | `NotFoundComponent` | toute URL inconnue               |
 
 La page détail lit l'`id` via `ActivatedRoute` et recherche le pays dans les
 données du service. Si l'`id` ne correspond à aucun pays (URL saisie à la main,

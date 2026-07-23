@@ -44,11 +44,9 @@
 
 ### Autres :
 
-- Un composant header pourrait être créé pour éviter la redondance dans les 2 fichiers home.hmtl et country.html (titre + KPIs)
+- Un composant header pourrait être créé pour éviter la redondance dans les 2 fichiers home.hmtl et country.html (titre + stats)
 
 ## Architecture cible
-
-_réalisée via https://tree.nathanfriend.com_
 
 Légende :
 
@@ -62,7 +60,7 @@ src/
 ├── 📦 index.html
 ├── 📦 main.ts
 ├── 📦 polyfills.ts
-├── 📦 styles.scss
+├── ♻️ styles.scss
 ├── 📦 test.ts
 │
 ├── app/
@@ -73,7 +71,7 @@ src/
 │   ├── ♻️ app.component.ts             # squelette : <router-outlet> + chargement initial des données
 │   ├── ♻️ app.module.ts                # déclarations + httpClient (Va déclarer le HeaderComponent)
 │   │
-│   ├── ✨ core/                        # logique métier, sans UI
+│   ├── ✨ core/                        # logique métier
 │   │   ├── models/
 │   │   │   ├── olympic.ts              # interface Olympic
 │   │   │   ├── participation.ts        # interface Participation
@@ -81,10 +79,10 @@ src/
 │   │   ├── services/
 │   │   │   └── olympic.service.ts      # le DataService : accès centralisé aux données
 │   │   └── constants/
-│   │       └── chart-colors.ts         # palette de couleur factorisée
+│   │       └── chart-colors.ts         # palette de couleur des graphiques factorisées
 │   │
-│   ├── ✨ components/                  # composants réutilisables (UI pure)
-│   │   └── header/                     # titre + KPIs
+│   ├── ✨ components/                  # composants réutilisables (UI)
+│   │   └── header/                     # titre + stats
 │   │       ├── header.component.html
 │   │       ├── header.component.scss
 │   │       └── header.component.ts
