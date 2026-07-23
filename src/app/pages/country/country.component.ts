@@ -17,7 +17,7 @@ export class CountryComponent implements OnInit, AfterViewInit {
   public totalAthletes = 0;
 
   private readonly destroyRef = inject(DestroyRef);
-  private countryName: string | null = null;
+  private countryId: number | null = null;
   private selectedCountry?: Olympic;
   private viewReady = false;
   private lineChart?: Chart<'line', number[], number>;
@@ -25,7 +25,8 @@ export class CountryComponent implements OnInit, AfterViewInit {
   constructor(private route: ActivatedRoute, private olympicService: OlympicService) {}
 
   ngOnInit(): void {
-    this.countryName = this.route.snapshot.paramMap.get('countryName');
+    const idParam = this.route.snapshot.paramMap.get('id');
+    this.countryId = idParam !== null ? Number(idParam) : null;
     this.olympicService
       .getOlympics()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -33,7 +34,7 @@ export class CountryComponent implements OnInit, AfterViewInit {
         if (!olympics) {
           return;
         }
-        this.selectedCountry = olympics.find((olympic) => olympic.country === this.countryName);
+        this.selectedCountry = olympics.find((olympic) => olympic.id === this.countryId);
         if (!this.selectedCountry) {
           return;
         }
