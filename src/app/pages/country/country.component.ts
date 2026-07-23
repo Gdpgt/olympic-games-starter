@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Chart from 'chart.js/auto';
 import { Olympic } from '../../core/models/olympic';
@@ -22,7 +22,11 @@ export class CountryComponent implements OnInit, AfterViewInit {
   private viewReady = false;
   private lineChart?: Chart<'line', number[], number>;
 
-  constructor(private route: ActivatedRoute, private olympicService: OlympicService) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private olympicService: OlympicService
+  ) {}
 
   ngOnInit(): void {
     const idParam = this.route.snapshot.paramMap.get('id');
@@ -36,6 +40,7 @@ export class CountryComponent implements OnInit, AfterViewInit {
         }
         this.selectedCountry = olympics.find((olympic) => olympic.id === this.countryId);
         if (!this.selectedCountry) {
+          this.router.navigate(['/not-found']);
           return;
         }
         const participations = this.selectedCountry.participations;
