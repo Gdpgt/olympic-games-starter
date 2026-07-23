@@ -18,7 +18,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
+    gap: 12px;
     margin: 5px;
     padding: 0;
     list-style: none;
@@ -27,11 +27,19 @@
   &__stat {
     display: flex;
     flex-direction: column;
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 200px;
     padding: 10px;
     border: solid #0b868f 1px;
     border-radius: 10px;
     color: gray;
     text-align: center;
+
+    @media (min-width: 768px) {
+      flex: 0 0 auto;
+      max-width: none;
+    }
   }
 
   &__stat-value {

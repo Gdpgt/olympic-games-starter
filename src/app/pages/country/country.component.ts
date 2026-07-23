@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Chart from 'chart.js/auto';
@@ -25,7 +31,7 @@ export class CountryComponent implements OnInit, AfterViewInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private olympicService: OlympicService
+    private olympicService: OlympicService,
   ) {}
 
   ngOnInit(): void {
@@ -38,7 +44,9 @@ export class CountryComponent implements OnInit, AfterViewInit {
         if (!olympics) {
           return;
         }
-        this.selectedCountry = olympics.find((olympic) => olympic.id === this.countryId);
+        this.selectedCountry = olympics.find(
+          (olympic) => olympic.id === this.countryId,
+        );
         if (!this.selectedCountry) {
           this.router.navigate(['/not-found']);
           return;
@@ -49,11 +57,17 @@ export class CountryComponent implements OnInit, AfterViewInit {
           { label: 'Number of entries', value: participations.length },
           {
             label: 'Total Number of medals',
-            value: participations.reduce((total, participation) => total + participation.medalsCount, 0),
+            value: participations.reduce(
+              (total, participation) => total + participation.medalsCount,
+              0,
+            ),
           },
           {
             label: 'Total Number of athletes',
-            value: participations.reduce((total, participation) => total + participation.athleteCount, 0),
+            value: participations.reduce(
+              (total, participation) => total + participation.athleteCount,
+              0,
+            ),
           },
         ];
         if (this.viewReady) {
@@ -73,8 +87,12 @@ export class CountryComponent implements OnInit, AfterViewInit {
     if (!this.selectedCountry) {
       return;
     }
-    const years = this.selectedCountry.participations.map((participation) => participation.year);
-    const medals = this.selectedCountry.participations.map((participation) => participation.medalsCount);
+    const years = this.selectedCountry.participations.map(
+      (participation) => participation.year,
+    );
+    const medals = this.selectedCountry.participations.map(
+      (participation) => participation.medalsCount,
+    );
     this.lineChart?.destroy();
     this.lineChart = new Chart('countryChart', {
       type: 'line',
@@ -89,7 +107,8 @@ export class CountryComponent implements OnInit, AfterViewInit {
         ],
       },
       options: {
-        aspectRatio: 2.5,
+        responsive: true,
+        maintainAspectRatio: false,
         scales: {
           x: {
             title: { display: true, text: 'Dates' },

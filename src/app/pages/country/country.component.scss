@@ -1,15 +1,16 @@
-
-.wrapper-container {
-    display: flex;
-    justify-content: center;
+.chart-container {
+  position: relative;
+  height: 440px;
 }
 
-.container {
-    width: 50%;
+@media screen and (max-width: 1199px) {
+  .chart-container {
+    height: 360px;
+  }
 }
 
-@media screen and (max-width: 1000px) {
-    .container {
-        width: 100%;
-    }
+@media screen and (max-width: 767px) {
+  .chart-container {
+    height: 280px;
+  }
 }

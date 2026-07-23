@@ -72,7 +72,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
         ],
       },
       options: {
-        aspectRatio: 2.5,
+        responsive: true,
+        maintainAspectRatio: false,
         onClick: (event) => this.onChartClick(event),
       },
     });
