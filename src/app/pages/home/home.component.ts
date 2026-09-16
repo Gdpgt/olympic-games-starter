@@ -1,4 +1,10 @@
-import { AfterViewInit, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  DestroyRef,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Chart, { ChartEvent } from 'chart.js/auto';
@@ -10,7 +16,6 @@ import { OlympicService } from '../../core/services/olympic.service';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   public titlePage = 'Medals per Country';
@@ -21,7 +26,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
   private viewReady = false;
   private pieChart?: Chart<'pie', number[], string>;
 
-  constructor(private router: Router, private olympicService: OlympicService) {}
+  constructor(
+    private router: Router,
+    private olympicService: OlympicService,
+  ) {}
 
   ngOnInit(): void {
     this.olympicService
@@ -33,7 +41,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
         }
         this.olympics = olympics;
         const totalJOs = new Set(
-          olympics.flatMap((olympic) => olympic.participations.map((participation) => participation.year))
+          olympics.flatMap((olympic) =>
+            olympic.participations.map((participation) => participation.year),
+          ),
         ).size;
         this.stats = [
           { label: 'Number of countries', value: olympics.length },
@@ -55,7 +65,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
   private renderPieChart(): void {
     const countries = this.olympics.map((olympic) => olympic.country);
     const medalsPerCountry = this.olympics.map((olympic) =>
-      olympic.participations.reduce((total, participation) => total + participation.medalsCount, 0)
+      olympic.participations.reduce(
+        (total, participation) => total + participation.medalsCount,
+        0,
+      ),
     );
     this.pieChart?.destroy();
     this.pieChart = new Chart('DashboardPieChart', {
@@ -83,7 +96,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
     if (!event.native || !this.pieChart) {
       return;
     }
-    const points = this.pieChart.getElementsAtEventForMode(event.native, 'point', { intersect: true }, true);
+    const points = this.pieChart.getElementsAtEventForMode(
+      event.native,
+      'point',
+      { intersect: true },
+      true,
+    );
     if (points.length === 0) {
       return;
     }

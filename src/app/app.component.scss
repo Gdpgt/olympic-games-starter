@@ -1,6 +1,16 @@
+@use "../styles/breakpoints" as bp;
+
 .page-container {
   display: block;
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
+
+  @include bp.tablet-up {
+    padding: 1.5rem;
+  }
+
+  @include bp.desktop {
+    padding: 0rem;
+  }
 }
