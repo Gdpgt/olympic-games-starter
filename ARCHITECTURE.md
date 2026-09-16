@@ -97,3 +97,14 @@ construits dans `ngAfterViewInit` pour garantir la présence du `<canvas>` dans 
 DOM au moment de l'instanciation (le `BehaviorSubject` pouvant émettre de façon
 synchrone si les données sont déjà en cache). La palette de couleurs est factorisée dans
 `core/constants/chart-colors.ts`.
+
+## Responsive
+
+Approche mobile-first. Les paliers de la spécification sont factorisés dans le partial
+`src/styles/_breakpoints.scss` : mobile par défaut (≤ 767px), mixin `tablet-up`
+(≥ 768px) et mixin `desktop` (≥ 1200px). Chaque feuille de style l'importe via
+`@use` et déclare ses règles dans cet ordre : base, tablette, puis desktop.
+
+- `.chart-container` est une classe **globale** (`src/styles.scss`) partagée par
+  les pages à graphique : sa hauteur suit les paliers (300 / 380 / 350px) et
+  Chart.js (`responsive: true`, `maintainAspectRatio: false`) s'y adapte.
