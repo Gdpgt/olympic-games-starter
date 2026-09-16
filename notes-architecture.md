@@ -48,6 +48,15 @@
 
 ## Architecture cible
 
+### Design patterns appliqués
+
+- **Singleton** : `OlympicService` en `providedIn: 'root'`, une seule instance partagée par toute l'application
+- **Dependency Injection** : les composants reçoivent `OlympicService` (et `ActivatedRoute`) via leur constructeur plutôt que de les instancier eux-mêmes
+- **Observer** : flux de données asynchrone via RxJS (`Observable` / `subscribe`), avec désabonnement géré par `takeUntilDestroyed(this.destroyRef)`.
+- **Composition** : `HeaderComponent` réutilisé par composition dans `home` et `country` (titre + stats), plutôt que dupliqué
+
+_réalisée via https://tree.nathanfriend.com_
+
 Légende :
 
 - ✨ : Nouveaux dossiers et fichiers à créer
