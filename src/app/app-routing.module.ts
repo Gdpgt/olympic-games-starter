@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { CountryComponent } from "./pages/country/country.component";
+import { DataUnavailableComponent } from './pages/data-unavailable/data-unavailable.component';
 
 const routes: Routes = [
   {
@@ -17,6 +18,10 @@ const routes: Routes = [
   {
     path : 'not-found',
     component : NotFoundComponent
+  },
+  {
+    path: 'data-unavailable',
+    component: DataUnavailableComponent,
   },
   {
     path: '**',
