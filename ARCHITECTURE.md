@@ -29,12 +29,14 @@ src/app/
 │       └── chart-colors.ts      # palette de couleurs des graphiques factorisées
 │
 ├── components/                  # composants réutilisables (UI)
-│   └── header/                  # titre + stats
+│   ├── header/                  # titre + stats
+│   └── loading/                 # indicateur de chargement (spinner)
 │
 └── pages/                       # composants routés (un par écran)
     ├── home/                    # dashboard : pie chart + stats
     ├── country/                 # détail pays : line chart + stats
-    └── not-found/               # page d'erreur
+    ├── not-found/               # page d'erreur : page ou pays inexistant
+    └── data-unavailable/        # page d'erreur : données indisponibles
 ```
 
 ## Rôle des dossiers
@@ -45,7 +47,9 @@ src/app/
 - `components/` - composants d'UI réutilisables, sans logique métier.
   Le `HeaderComponent` affiche un titre et itère sur une
   liste de `StatItem` (libellé/valeur) ; il est réutilisé par le dashboard et la
-  page détail.
+  page détail. Le `LoadingComponent` affiche un spinner et le texte « Loading
+  data... » (`role="status"` pour les lecteurs d'écran) ; les deux pages
+  l'affichent tant que les données ne sont pas chargées.
 - `pages/` - un composant par écran, câblé au routing. Chaque page récupère
   ses données via le service et construit son graphique.
 
@@ -56,7 +60,12 @@ pattern BehaviorSubject + chargement au démarrage :
 
 1. `AppComponent` appelle `loadInitialData()` une seule fois au démarrage.
 2. Le service fait le `HttpClient.get<Olympic[]>` et pousse le résultat dans un
-   `BehaviorSubject<Olympic[] | null>` (`null` = pas encore chargé).
+   `BehaviorSubject<Olympic[] | null>`. Trois états possibles :
+   - `null` : chargement en cours (état initial) ;
+   - `[]` : aucune donnée, soit parce que le chargement a échoué (l'erreur est
+     tracée en `console.error` pour les développeurs), soit parce que le fichier
+     est vide ;
+   - tableau non vide : données disponibles.
 3. Les pages s'abonnent à `getOlympics()` (l'`Observable` en lecture seule). Le
    `BehaviorSubject` rejoue sa dernière valeur : peu importe quand une page
    s'abonne, elle obtient immédiatement les données déjà chargées.
@@ -78,17 +87,36 @@ Aucun `any` : toutes les données sont typées par ces interfaces.
 
 ## Routing et gestion d'erreur
 
-| Route         | Composant           | Rôle                             |
-| ------------- | ------------------- | -------------------------------- |
-| `''`          | `HomeComponent`     | dashboard (route par défaut)     |
-| `country/:id` | `CountryComponent`  | détail d'un pays par identifiant |
-| `not-found`   | `NotFoundComponent` | page d'erreur                    |
-| `**`          | `NotFoundComponent` | toute URL inconnue               |
+| Route              | Composant                  | Rôle                             |
+| ------------------ | -------------------------- | -------------------------------- |
+| `''`               | `HomeComponent`            | dashboard (route par défaut)     |
+| `country/:id`      | `CountryComponent`         | détail d'un pays par identifiant |
+| `not-found`        | `NotFoundComponent`        | page ou pays inexistant          |
+| `data-unavailable` | `DataUnavailableComponent` | données indisponibles            |
+| `**`               | `NotFoundComponent`        | toute URL inconnue               |
 
-La page détail lit l'`id` via `ActivatedRoute` et recherche le pays dans les
-données du service. Si l'`id` ne correspond à aucun pays (URL saisie à la main,
-identifiant inexistant), l'utilisateur est redirigé vers `NotFoundComponent` : pas
-d'écran vide ni de message technique.
+Chaque page vérifie elle-même l'état des données reçues du service :
+
+| Cas                   | Détection                                           | Affichage                       |
+| --------------------- | --------------------------------------------------- | ------------------------------- |
+| Chargement en cours   | le service émet `null`                              | `LoadingComponent` (spinner)    |
+| Mauvaise URL          | route `**`                                          | `NotFoundComponent`             |
+| ID invalide           | `CountryComponent` : aucun pays ne correspond à l'`id` lu via `ActivatedRoute` | `NotFoundComponent` |
+| Données manquantes    | Home ou Country : le service émet `[]`              | `DataUnavailableComponent`      |
+
+Deux pages d'erreur distinctes, car ce sont deux situations différentes : ce que
+l'utilisateur demande n'existe pas (équivalent d'une erreur HTTP 404), ou les
+données n'ont pas pu être chargées (équivalent d'une erreur 503). Chacune affiche
+un message clair, sans détail technique : `NotFoundComponent` propose un lien « Go
+back » vers le dashboard, `DataUnavailableComponent` un bouton « Try again » qui
+recharge la page.
+
+Les redirections utilisent `router.navigate([...], { skipLocationChange: true })` :
+la page d'erreur s'affiche mais la barre d'adresse garde l'URL saisie, comme pour la
+route `**` et comme le ferait un serveur qui renvoie une 404. Un rafraîchissement
+(F5) relance donc le chargement de la page réellement demandée. La mise en page
+commune aux deux pages d'erreur est factorisée dans la classe globale `.error-page`
+(`src/styles.scss`).
 
 ## Graphiques
 

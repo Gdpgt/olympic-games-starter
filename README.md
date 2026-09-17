@@ -40,8 +40,11 @@ npm install
   (nombre de pays, nombre de JOs). Un clic sur un pays ouvre sa page de détail.
 - **Détail pays** (`/country/:id`) : KPIs (participations, total de médailles,
   total d'athlètes), courbe d'évolution des médailles par édition, bouton retour.
-- **Gestion d'erreur** : URL inconnue ou identifiant de pays inexistant →
-  redirection vers une page d'erreur claire.
+- **Chargement** : un indicateur (spinner) s'affiche tant que les données ne sont
+  pas disponibles.
+- **Gestion d'erreur** : URL inconnue ou identifiant de pays inexistant → page
+  « page introuvable » ; données impossibles à charger ou vides → page « données
+  indisponibles ». L'URL saisie reste affichée dans la barre d'adresse.
 - **Responsive** desktop / tablette / mobile et accessibilité de base (focus
   clavier visible, descriptions textuelles des graphiques).
 
@@ -50,8 +53,8 @@ npm install
 ```
 src/app/
 ├── core/          # logique métier : models, services, constants
-├── components/    # composants réutilisables (header)
-└── pages/         # écrans routés (home, country, not-found)
+├── components/    # composants réutilisables (header, loading)
+└── pages/         # écrans routés (home, country, not-found, data-unavailable)
 ```
 
 Les données proviennent de `src/assets/mock/olympic.json`, mais transitent
