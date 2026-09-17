@@ -36,7 +36,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
       .getOlympics()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((olympics) => {
-        if (!olympics || olympics.length === 0) {
+        if (olympics === null) {
+          return;
+        }
+        if (olympics.length === 0) {
+          this.router.navigate(['/data-unavailable'], { skipLocationChange: true });
           return;
         }
         this.olympics = olympics;

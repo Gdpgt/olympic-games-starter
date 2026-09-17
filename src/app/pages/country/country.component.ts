@@ -41,14 +41,18 @@ export class CountryComponent implements OnInit, AfterViewInit {
       .getOlympics()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((olympics) => {
-        if (!olympics) {
+        if (olympics === null) {
+          return;
+        }
+        if (olympics.length === 0) {
+          this.router.navigate(['/data-unavailable'], { skipLocationChange: true });
           return;
         }
         this.selectedCountry = olympics.find(
           (olympic) => olympic.id === this.countryId,
         );
         if (!this.selectedCountry) {
-          this.router.navigate(['/not-found']);
+          this.router.navigate(['/not-found'], { skipLocationChange: true });
           return;
         }
         this.titlePage = this.selectedCountry.country;

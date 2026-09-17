@@ -17,7 +17,7 @@ export class OlympicService {
       tap((olympics) => this.olympics$.next(olympics)),
       catchError((error: HttpErrorResponse) => {
         console.error('Failed to load Olympic data', error);
-        this.olympics$.next(null);
+        this.olympics$.next([]);
         return of([]);
       })
     );
