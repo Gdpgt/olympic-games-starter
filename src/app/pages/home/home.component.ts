@@ -20,6 +20,7 @@ import { OlympicService } from '../../core/services/olympic.service';
 export class HomeComponent implements OnInit, AfterViewInit {
   public titlePage = 'Medals per Country';
   public stats: StatItem[] = [];
+  public isLoading = true;
 
   private readonly destroyRef = inject(DestroyRef);
   private olympics: Olympic[] = [];
@@ -39,6 +40,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         if (olympics === null) {
           return;
         }
+        this.isLoading = false;
         if (olympics.length === 0) {
           this.router.navigate(['/data-unavailable'], { skipLocationChange: true });
           return;

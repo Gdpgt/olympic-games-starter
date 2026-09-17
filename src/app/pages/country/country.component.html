@@ -1,5 +1,6 @@
 <div>
   <app-header [title]="titlePage" [stats]="stats"></app-header>
+  <app-loading *ngIf="isLoading"></app-loading>
   <div class="chart-container">
     <canvas
       id="countryChart"

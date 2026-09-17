@@ -8,6 +8,7 @@ import { NotFoundComponent } from './pages/not-found/not-found.component';
 import { CountryComponent } from "./pages/country/country.component";
 import { HeaderComponent } from './components/header/header.component';
 import { DataUnavailableComponent } from './pages/data-unavailable/data-unavailable.component';
+import { LoadingComponent } from './components/loading/loading.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { DataUnavailableComponent } from './pages/data-unavailable/data-unavaila
     CountryComponent,
     HeaderComponent,
     DataUnavailableComponent,
+    LoadingComponent,
   ],
   imports: [BrowserModule, AppRoutingModule],
   providers: [provideHttpClient()],

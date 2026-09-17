@@ -21,6 +21,7 @@ import { OlympicService } from '../../core/services/olympic.service';
 export class CountryComponent implements OnInit, AfterViewInit {
   public titlePage = '';
   public stats: StatItem[] = [];
+  public isLoading = true;
 
   private readonly destroyRef = inject(DestroyRef);
   private countryId: number | null = null;
@@ -44,6 +45,7 @@ export class CountryComponent implements OnInit, AfterViewInit {
         if (olympics === null) {
           return;
         }
+        this.isLoading = false;
         if (olympics.length === 0) {
           this.router.navigate(['/data-unavailable'], { skipLocationChange: true });
           return;
