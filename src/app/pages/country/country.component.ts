@@ -10,6 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import Chart from 'chart.js/auto';
 import { CHART_PRIMARY_COLOR } from '../../core/constants/chart-colors';
 import { Olympic } from '../../core/models/olympic';
+import { Participation } from '../../core/models/participation';
 import { StatItem } from '../../core/models/stat-item';
 import { OlympicService } from '../../core/services/olympic.service';
 
@@ -50,25 +51,8 @@ export class CountryComponent implements OnInit, AfterViewInit {
           this.router.navigate(['/not-found']);
           return;
         }
-        const participations = this.selectedCountry.participations;
         this.titlePage = this.selectedCountry.country;
-        this.stats = [
-          { label: 'Number of entries', value: participations.length },
-          {
-            label: 'Total Number of medals',
-            value: participations.reduce(
-              (total, participation) => total + participation.medalsCount,
-              0,
-            ),
-          },
-          {
-            label: 'Total Number of athletes',
-            value: participations.reduce(
-              (total, participation) => total + participation.athleteCount,
-              0,
-            ),
-          },
-        ];
+        this.stats = this.buildStats(this.selectedCountry.participations);
         if (this.viewReady) {
           this.renderLineChart();
         }
@@ -80,6 +64,26 @@ export class CountryComponent implements OnInit, AfterViewInit {
     if (this.selectedCountry) {
       this.renderLineChart();
     }
+  }
+
+  private buildStats(participations: Participation[]): StatItem[] {
+    return [
+      { label: 'Number of entries', value: participations.length },
+      {
+        label: 'Total Number of medals',
+        value: participations.reduce(
+          (total, participation) => total + participation.medalsCount,
+          0,
+        ),
+      },
+      {
+        label: 'Total Number of athletes',
+        value: participations.reduce(
+          (total, participation) => total + participation.athleteCount,
+          0,
+        ),
+      },
+    ];
   }
 
   private renderLineChart(): void {
