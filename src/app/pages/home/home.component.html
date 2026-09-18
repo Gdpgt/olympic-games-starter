@@ -2,6 +2,11 @@
 <hr />
 <div>
   <app-header [title]="titlePage" [stats]="stats"></app-header>
+  <p class="intro-text">
+    Welcome to the Olympic Games dashboard. Explore the total medal count per
+    country across every edition, and click on a country to see its detailed
+    performance.
+  </p>
   <app-loading *ngIf="isLoading"></app-loading>
   <div class="chart-container">
     <canvas

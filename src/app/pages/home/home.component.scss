@@ -1,0 +1,19 @@
+@use "../../../styles/breakpoints" as bp;
+
+.intro-text {
+  max-width: 60ch;
+  margin: 10px auto 20px;
+  padding: 0 10px;
+  color: #6c6c6c;
+  text-align: center;
+  line-height: 1.5;
+  font-size: 0.9rem;
+
+  @include bp.tablet-up {
+    font-size: 1rem;
+  }
+
+  @include bp.desktop {
+    font-size: 1.05rem;
+  }
+}

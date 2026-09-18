@@ -16,6 +16,7 @@ import { OlympicService } from '../../core/services/olympic.service';
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
+  styleUrl: './home.component.scss',
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   public titlePage = 'Medals per Country';
