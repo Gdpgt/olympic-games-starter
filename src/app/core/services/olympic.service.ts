@@ -14,7 +14,7 @@ export class OlympicService {
 
   loadInitialData(): Observable<Olympic[]> {
     return this.http.get<Olympic[]>(this.olympicUrl).pipe(
-      tap((olympics) => this.olympics$.next(olympics)),
+      tap((olympics) => this.olympics$.next(this.sortByTotalMedalsDesc(olympics))),
       catchError((error: HttpErrorResponse) => {
         console.error('Failed to load Olympic data', error);
         this.olympics$.next([]);
@@ -25,5 +25,13 @@ export class OlympicService {
 
   getOlympics(): Observable<Olympic[] | null> {
     return this.olympics$.asObservable();
+  }
+
+  private sortByTotalMedalsDesc(olympics: Olympic[]): Olympic[] {
+    return [...olympics].sort((a, b) => this.totalMedals(b) - this.totalMedals(a));
+  }
+
+  private totalMedals(olympic: Olympic): number {
+    return olympic.participations.reduce((total, participation) => total + participation.medalsCount, 0);
   }
 }
